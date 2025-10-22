@@ -1,63 +1,80 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { Modal } from '@/components/ui/Model'
-import { Input } from '@/components/ui/Input'
-import { Select } from '@/components/ui/Select'
-import { Button } from '@/components/ui/Button'
+import { useState } from 'react';
+import { Modal } from '../ui/Model';
+import { Input } from '../../components/ui/Input';
+import { Select } from '../../components/ui/Select';
+import { Button } from '../../components/ui/Button';
+import { useUsers } from '@/lib/hooks/useUsers';
 
 export function CreateUserModal({ isOpen, onClose, onSuccess }) {
+  const { refetch } = useUsers();
+
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    full_name: '',
-    role: 'user'
-  })
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+    role: 'user',
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
 
   const roleOptions = [
     { value: 'user', label: 'User' },
     { value: 'admin', label: 'Admin' },
     { value: 'moderator', label: 'Moderator' },
-    { value: 'viewer', label: 'Viewer' }
-  ]
+    { value: 'viewer', label: 'Viewer' },
+  ];
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setError('')
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setMessage('');
 
     try {
-      // NOTE: This assumes you have a Next.js API route set up at /api/admin/users/create
-      const response = await fetch('/api/admin/users/create', {
+      const response = await fetch('/api/admin/users/invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      })
+        body: JSON.stringify({
+          email: formData.email,
+          metadata: {
+            role: formData.role,
+          },
+        }),
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
-      if (response.ok) {
-        setFormData({ email: '', password: '', full_name: '', role: 'user' })
-        onSuccess()
-        onClose()
-      } else {
-        setError(data.error || 'Failed to create user')
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send invite');
       }
+
+      setMessage(`✅ Invitation sent to ${formData.email}`);
+      setFormData({ email: '', role: 'user' });
+
+      refetch?.();
+      onSuccess?.();
     } catch (err) {
-      setError('An error occurred')
+      console.error(err);
+      setError(`❌ ${err.message}`);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Create New User">
+    <Modal isOpen={isOpen} onClose={onClose} title="Invite New User">
       <form onSubmit={handleSubmit}>
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
             {error}
+          </div>
+        )}
+
+        {message && (
+          <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+            {message}
           </div>
         )}
 
@@ -71,25 +88,6 @@ export function CreateUserModal({ isOpen, onClose, onSuccess }) {
           required
         />
 
-        <Input
-          label="Password"
-          id="password"
-          type="password"
-          value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          placeholder="Minimum 6 characters"
-          required
-        />
-
-        <Input
-          label="Full Name"
-          id="full_name"
-          type="text"
-          value={formData.full_name}
-          onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-          placeholder="John Doe"
-        />
-
         <Select
           label="Role"
           id="role"
@@ -100,14 +98,19 @@ export function CreateUserModal({ isOpen, onClose, onSuccess }) {
         />
 
         <div className="flex gap-3 mt-6">
-          <Button type="button" variant="secondary" onClick={onClose} className="flex-1">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onClose}
+            className="flex-1"
+          >
             Cancel
           </Button>
           <Button type="submit" disabled={loading} className="flex-1">
-            {loading ? 'Creating...' : 'Create User'}
+            {loading ? 'Sending...' : 'Send Invite'}
           </Button>
         </div>
       </form>
     </Modal>
-  )
+  );
 }
