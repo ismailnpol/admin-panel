@@ -1,61 +1,52 @@
-"use client";
+'use client'
 
-import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
 
 export function useAuth() {
-  const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
-  const supabase = createClient();
+  const [user, setUser] = useState(null)
+  const [profile, setProfile] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
+  // NOTE: createClient needs to be implemented to use Supabase client
+  const supabase = createClient() 
 
   useEffect(() => {
     const fetchUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
 
       if (user) {
-        const { data: profile ,error} = await supabase
-          .from("user_profiles")
-          .select("*")
-          .eq("id", user.id)
-          .single();
-        setProfile(profile);
-        if(error){
-          console.error("Error fetching profile:", error);
-        }
+        // NOTE: 'user_profiles' table must exist in your Supabase schema
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+        
+        setProfile(profile)
       }
-      setLoading(false);
-    };
+      
+      setLoading(false)
+    }
 
-    fetchUser();
+    fetchUser()
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
       if (!session) {
-        setProfile(null);
+        setProfile(null)
       }
-    });
+    })
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => subscription.unsubscribe()
+  }, [])
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    router.push("/login");
-  };
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
 
-  return {
-    user,
-    profile,
-    loading,
-    signOut,
-    isAdmin: profile?.role === "admin",
-  };
+  return { user, profile, loading, signOut, isAdmin: profile?.role === 'admin' }
 }
