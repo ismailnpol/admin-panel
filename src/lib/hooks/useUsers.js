@@ -10,6 +10,7 @@ export function useUsers() {
   const fetchUsers = async () => {
     try {
       setLoading(true)
+      // NOTE: This assumes you have a Next.js API route set up at /api/admin/users
       const response = await fetch('/api/admin/users')
       const data = await response.json()
       
