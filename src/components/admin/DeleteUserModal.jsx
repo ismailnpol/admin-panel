@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Modal } from '../../components/ui/Model'
+import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 
 export function DeleteUserModal({ isOpen, onClose, user, onSuccess }) {
@@ -11,6 +11,7 @@ export function DeleteUserModal({ isOpen, onClose, user, onSuccess }) {
     setLoading(true)
 
     try {
+      // NOTE: This assumes you have a Next.js API route set up for user deletion
       const response = await fetch(`/api/admin/users/${user.id}`, {
         method: 'DELETE'
       })
