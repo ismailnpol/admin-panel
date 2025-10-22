@@ -9,11 +9,11 @@ export function Sidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const menuItems = [
-    { name: 'HOME', href: '/admin', icon: '🏠' },
-    { name: 'USERS', href: '/admin/users', icon: '👥' },
-    { name: 'ROLES', href: '/admin/roles', icon: '🔐' },
-    { name: 'SETTINGS', href: '/admin/settings', icon: '⚙️' },
-    { name: 'REPORTS', href: '/admin/reports', icon: '📊' },
+    { name: 'HOME', href: '/admin', },
+    { name: 'USERS', href: '/admin/users', },
+    { name: 'ROLES', href: '/admin/roles', },
+    { name: 'SETTINGS', href: '/admin/settings', },
+    { name: 'REPORTS', href: '/admin/reports', },
   ]
 
   return (

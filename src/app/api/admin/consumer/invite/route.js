@@ -7,29 +7,29 @@ export async function POST(request) {
     const supabase = await createServerSupabaseClient();
 
     // Check if current user is admin
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    // const {
+    //   data: { user },
+    // } = await supabase.auth.getUser();
 
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    // if (!user) {
+    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // }
 
-    const { data: profile } = await supabase
-      .from("user_profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
+    // const { data: profile } = await supabase
+    //   .from("user_profiles")
+    //   .select("role")
+    //   .eq("id", user.id)
+    //   .single();
 
-    if (profile?.role !== "admin") {
-      return NextResponse.json(
-        { error: "Forbidden: Admin access required" },
-        { status: 403 }
-      );
-    }
+    // if (profile?.role !== "admin") {
+    //   return NextResponse.json(
+    //     { error: "Forbidden: Admin access required" },
+    //     { status: 403 }
+    //   );
+    // }
 
     // Get request data
-    const { email, metadata } = await request.json();
+    const { email } = await request.json();
 
     // Validate input
     if (!email) {
@@ -41,19 +41,10 @@ export async function POST(request) {
 
     // Create user using admin client
     const adminClient = createAdminClient();
-    if (!metadata.role) {
-      metadata.role = "user";
-    }
     const { data, error: sendError } =
-      await adminClient.auth.admin.inviteUserByEmail(
-        email,
-        {
-          redirectTo: `${process.env.NEXT_PUBLIC_API_URL}/auth/user/confirm/`,
-        },
-        {
-          data: metadata, // ✅ this becomes user_metadata
-        }
-      );
+      await adminClient.auth.admin.inviteUserByEmail(email, {
+        redirectTo: `${process.env.NEXT_PUBLIC_API_URL}/auth/consumer/confirm/`,
+      });
 
     if (sendError) {
       return NextResponse.json({ error: sendError.message }, { status: 400 });
@@ -64,18 +55,16 @@ export async function POST(request) {
       const { id, email: invitedEmail } = invitedUser;
 
       // Create or update user profile
-      const { error: profileError } = await adminClient
-        .from("user_profiles")
-        .upsert(
-          {
-            id,
-            email: invitedEmail,
-            role: metadata.role || "user",
-            // department: metadata.department || null,
-            // invited_by: metadata.invited_by || null,
-          },
-          { onConflict: "id" }
-        );
+      const { error: profileError } = await adminClient.from("profiles").upsert(
+        {
+          user_id: id,
+          // email: invitedEmail,
+          // role: metadata.role || "user",
+          // department: metadata.department || null,
+          // invited_by: metadata.invited_by || null,
+        },
+        { onConflict: "id" }
+      );
 
       if (profileError) {
         console.error("⚠️ Failed to create profile:", profileError);

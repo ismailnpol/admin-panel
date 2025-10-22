@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Modal } from '@/components/ui/Modal'
+import { Modal } from '@/components/ui/Model'
 import { Button } from '@/components/ui/Button'
 
 export function DeleteUserModal({ isOpen, onClose, user, onSuccess }) {
