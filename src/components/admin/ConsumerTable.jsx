@@ -1,7 +1,7 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
-import { ConsumerRow } from "./consumerRow";
+import {  useEffect, useState } from "react";
+import { ConsumerRow } from "./ConsumerRow";
 import { DeleteConsumerModal } from "./DeleteConsumerModel";
 import { useConsumer } from "@/lib/hooks/useConsumer";
 
