@@ -3,28 +3,18 @@
 import { useState } from 'react';
 import { Modal } from '../ui/Model';
 import { Input } from '../../components/ui/Input';
-import { Select } from '../../components/ui/Select';
 import { Button } from '../../components/ui/Button';
-import { useUsers } from '@/lib/hooks/useUsers';
-
-export function CreateUserModal({ isOpen, onClose, onSuccess }) {
-  const { refetch } = useUsers();
+import { useConsumer } from '@/lib/hooks/useConsumer';
+export function CreateConsumerModal({ isOpen, onClose, onSuccess }) {
+  const { refetch } = useConsumer();
 
   const [formData, setFormData] = useState({
     email: '',
-    role: 'user',
   });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
-
-  const roleOptions = [
-    { value: 'user', label: 'User' },
-    { value: 'admin', label: 'Admin' },
-    { value: 'moderator', label: 'Moderator' },
-    { value: 'viewer', label: 'Viewer' },
-  ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,14 +23,11 @@ export function CreateUserModal({ isOpen, onClose, onSuccess }) {
     setMessage('');
 
     try {
-      const response = await fetch('/api/admin/users/invite', {
+      const response = await fetch('/api/admin/consumers/invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.email,
-          metadata: {
-            role: formData.role,
-          },
         }),
       });
 
@@ -51,9 +38,11 @@ export function CreateUserModal({ isOpen, onClose, onSuccess }) {
       }
 
       setMessage(`✅ Invitation sent to ${formData.email}`);
-      setFormData({ email: '', role: 'user' });
+      setTimeout(() => {
+        setMessage("");
+      },5000);
+      setFormData({ email: ''});
 
-      refetch?.();
       onSuccess?.();
     } catch (err) {
       console.error(err);
@@ -64,8 +53,8 @@ export function CreateUserModal({ isOpen, onClose, onSuccess }) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Invite New User" >
-      <form onSubmit={handleSubmit} >
+    <Modal isOpen={isOpen} onClose={onClose} title="Invite New Consumer">
+      <form onSubmit={handleSubmit}>
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
             {error}
@@ -85,15 +74,6 @@ export function CreateUserModal({ isOpen, onClose, onSuccess }) {
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
           placeholder="user@example.com"
-          required
-        />
-
-        <Select
-          label="Role"
-          id="role"
-          value={formData.role}
-          onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-          options={roleOptions}
           required
         />
 

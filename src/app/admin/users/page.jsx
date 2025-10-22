@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { CreateUserModal } from '@/components/admin/CreateUserModal'
+import { CreateConsumerModal } from '@/components/admin/CreateConsumerModal'
 import { UserTable } from '@/components/admin/UserTable'
 import { useAuth } from '@/lib/hooks/useAuth'
 import { useRouter } from 'next/navigation'
@@ -10,6 +11,7 @@ import { useEffect } from 'react'
 
 export default function AdminUsersPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isCreateConsumerModalOpen, setIsCreateConsumerModalOpen] = useState(false)
   const { isAdmin, loading } = useAuth()
   const router = useRouter()
 
@@ -38,9 +40,14 @@ export default function AdminUsersPage() {
         <div>
           <p className="text-gray-600 mt-1">Create and manage user accounts</p>
         </div>
-        <Button onClick={() => setIsCreateModalOpen(true)}>
+        <div className='gap-2 flex'>
+          <Button onClick={() => setIsCreateModalOpen(true)}>
           + Create User
         </Button>
+        <Button onClick={() => setIsCreateConsumerModalOpen(true)}>
+          + Create Consumer
+        </Button>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow">
@@ -50,6 +57,11 @@ export default function AdminUsersPage() {
       <CreateUserModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={() => {}} // UserTable handles refetching internally via useUsers
+      />
+      <CreateConsumerModal
+        isOpen={isCreateConsumerModalOpen}
+        onClose={() => setIsCreateConsumerModalOpen(false)}
         onSuccess={() => {}} // UserTable handles refetching internally via useUsers
       />
     </div>

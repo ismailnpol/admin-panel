@@ -11,6 +11,7 @@ export function Sidebar() {
   const menuItems = [
     { name: 'HOME', href: '/admin', },
     { name: 'USERS', href: '/admin/users', },
+    { name: 'CONSUMER', href: '/admin/consumer', },
     { name: 'ROLES', href: '/admin/roles', },
     { name: 'SETTINGS', href: '/admin/settings', },
     { name: 'REPORTS', href: '/admin/reports', },

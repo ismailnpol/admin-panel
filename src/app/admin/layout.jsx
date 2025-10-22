@@ -11,6 +11,7 @@ export default function AdminLayout({ children }) {
   const getPageTitle = () => {
     if (pathname === '/admin') return 'HOME'
     if (pathname === '/admin/users') return 'USERS'
+    if (pathname === '/admin/consmers') return 'CONSMERS'
     if (pathname === '/admin/roles') return 'ROLES'
     if (pathname === '/admin/settings') return 'SETTINGS'
     if (pathname === '/admin/reports') return 'REPORTS'

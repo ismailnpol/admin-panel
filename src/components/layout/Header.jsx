@@ -46,7 +46,6 @@ export function Header({ title = 'HOME' }) {
                 onClick={handleLogout}
                 className="flex items-center gap-2"
               >
-                <span>🚪</span>
                 <span className="hidden sm:inline">Logout</span>
               </Button>
             </div>
