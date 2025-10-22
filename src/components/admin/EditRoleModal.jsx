@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { Modal } from '../../components/ui/Model'
+import { Modal } from '@/components/ui/Modal'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 
 export function EditRoleModal({ isOpen, onClose, user, onSuccess }) {
+  // NOTE: Initial state must be set only when modal opens, typically by passing user prop
   const [role, setRole] = useState(user?.role || 'user')
   const [loading, setLoading] = useState(false)
 
@@ -16,11 +17,17 @@ export function EditRoleModal({ isOpen, onClose, user, onSuccess }) {
     { value: 'viewer', label: 'Viewer' }
   ]
 
+  // Re-sync role state when user prop changes
+  useState(() => {
+      setRole(user?.role || 'user');
+  }, [user]);
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
 
     try {
+      // NOTE: This assumes you have a Next.js API route set up for role updates
       const response = await fetch(`/api/admin/users/${user.id}/role`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
